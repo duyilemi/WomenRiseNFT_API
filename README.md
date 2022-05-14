@@ -4,6 +4,11 @@ A subgraph for querying NTF data from the WomenRise smart contract, implementing
 
 # Subgraph
 
+### https://thegraph.com/hosted-service/subgraph/duyilemi/womenrise
+
+![Screenshot (1285)](https://user-images.githubusercontent.com/67197664/168444947-e3933799-e17a-4590-b3e5-50d856d6be2c.png)
+
+
 ## Querying for data
 
 ### Run the following query to get a list of tokens and their metadata:
