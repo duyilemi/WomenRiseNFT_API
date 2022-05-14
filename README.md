@@ -50,7 +50,7 @@ A subgraph for querying NTF data from the WomenRise smart contract, implementing
 ```
 {
   wrtokens(
-    # skip: 100
+    skip: 100
     orderDirection:desc
     orderBy: updatedAtTimestamp
   ) {
