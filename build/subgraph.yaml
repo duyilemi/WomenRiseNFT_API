@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum
     name: WRToken
@@ -18,8 +18,8 @@ dataSources:
         - User
       abis:
         - name: WRToken
-          file: ./abis/WRToken.json
+          file: WRToken\abis\WRToken.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-      file: ./src/mapping.ts
+      file: WRToken\WRToken.wasm

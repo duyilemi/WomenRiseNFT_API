@@ -1,53 +1,46 @@
 import {
-  Approval as ApprovalEvent,
-  ApprovalForAll as ApprovalForAllEvent,
-  OwnershipTransferred as OwnershipTransferredEvent,
-  Transfer as TransferEvent
-} from "../generated/WRToken/WRToken"
-import {
-  Approval,
-  ApprovalForAll,
-  OwnershipTransferred,
-  Transfer
-} from "../generated/schema"
+  Transfer as TransferEvent,
+  WRToken as WRTokenContract,
+} from "../generated/WRToken/WRToken";
 
-export function handleApproval(event: ApprovalEvent): void {
-  let entity = new Approval(
-    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  )
-  entity.owner = event.params.owner
-  entity.approved = event.params.approved
-  entity.tokenId = event.params.tokenId
-  entity.save()
-}
+import { WRToken, User } from "../generated/schema";
 
-export function handleApprovalForAll(event: ApprovalForAllEvent): void {
-  let entity = new ApprovalForAll(
-    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  )
-  entity.owner = event.params.owner
-  entity.operator = event.params.operator
-  entity.approved = event.params.approved
-  entity.save()
-}
+import { ipfs, json } from "@graphprotocol/graph-ts";
 
-export function handleOwnershipTransferred(
-  event: OwnershipTransferredEvent
-): void {
-  let entity = new OwnershipTransferred(
-    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  )
-  entity.previousOwner = event.params.previousOwner
-  entity.newOwner = event.params.newOwner
-  entity.save()
-}
+const ipfshash = "Qmcm7hNmHKEmMqHUwLYeMftTzk8fuE4r4xraBJ7YzMazUx";
 
 export function handleTransfer(event: TransferEvent): void {
-  let entity = new Transfer(
-    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  )
-  entity.from = event.params.from
-  entity.to = event.params.to
-  entity.tokenId = event.params.tokenId
-  entity.save()
+  let wrtoken = WRToken.load(event.params.tokenId.toString());
+  if (!wrtoken) {
+    wrtoken = new WRToken(event.params.tokenId.toString());
+    wrtoken.tokenID = event.params.tokenId;
+
+    wrtoken.tokenURI = "/" + event.params.tokenId.toString() + ".json";
+
+    let metadata = ipfs.cat(ipfshash + wrtoken.tokenURI);
+
+    if (metadata) {
+      const value = json.fromBytes(metadata).toObject();
+      if (value) {
+        const description = value.get("description");
+        const name = value.get("name");
+        const image = value.get("image");
+        if (description && name && image) {
+          wrtoken.name = name.toString();
+          wrtoken.description = description.toString();
+          wrtoken.image = image.toString();
+          wrtoken.ipfsURI = "ipfs.io/ipfs/" + ipfshash + wrtoken.tokenURI;
+        }
+      }
+    }
+  }
+  wrtoken.updatedAtTimestamp = event.block.timestamp;
+  wrtoken.owner = event.params.to.toHexString();
+  wrtoken.save();
+
+  let user = User.load(event.params.to.toHexString());
+  if (!user) {
+    user = new User(event.params.to.toHexString());
+    user.save();
+  }
 }
