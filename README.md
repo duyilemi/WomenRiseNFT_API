@@ -2,6 +2,8 @@
 
 A subgraph for querying NTF data from the WomenRise smart contract, implementing queries for fetching NFTs as well as their owners, building relationships between them, full text search, sorting, and filtering.
 
+# Subgraph
+
 ## Querying for data
 
 ### Run the following query to get a list of tokens and their metadata:
@@ -82,7 +84,7 @@ A subgraph for querying NTF data from the WomenRise smart contract, implementing
 ```
 {
   wrtSearch(
-    text: "'CRUSH PEARLS IN YOUR FISTS'"
+    text: "'movement celebrating and representing women scientists'"
   ) {
     id
     name
